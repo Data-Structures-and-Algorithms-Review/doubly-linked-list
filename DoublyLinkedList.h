@@ -30,11 +30,11 @@ public:
     template <size_t N>
     DoublyLinkedList(const T (&values)[N]);
 
-    void append(const T& value);
-    void push(const T& value);
-    void insert(int index, const T& value);
-    void remove(int index);
-    void clear();
+    DoublyLinkedList<T>& append(const T& value);
+    DoublyLinkedList<T>& push(const T& value);
+    DoublyLinkedList<T>& insert(int index, const T& value);
+    DoublyLinkedList<T>& remove(int index);
+    DoublyLinkedList<T>& clear();
     T pop(int index);
     void print();
     bool isEmpty();
@@ -43,8 +43,8 @@ public:
     std::unique_ptr<Node> getNode(int index);
     int firstIndexOf(const T& value);
     int lastIndexOf(const T& value);
-    void removeAll(const T& value);
-    void set(int index, const T& value);
+    DoublyLinkedList<T>& removeAll(const T& value);
+    DoublyLinkedList<T>& set(int index, const T& value);
 
     DoublyLinkedList<T>& operator+=(const T& value);
     DoublyLinkedList<T>& operator+(const T &value);
@@ -79,26 +79,28 @@ std::unique_ptr<typename DoublyLinkedList<T>::Node> DoublyLinkedList<T>::iter_to
         throw std::out_of_range("Index out of range");
     }
 
+    std::unique_ptr<Node> current = tail;
+
     if (index < length / 2) {
         std::unique_ptr<Node> current = head;
         for (int i = 0; i <= index; ++i) {
             current = current->next;
         }
-    } else {
-        std::unique_ptr<Node> current = tail;
+        return current;
+    }
+    
         for (int i = length - 1; i >= index; --i) {
             current = current->prev;
         }
-    }
 
-            return current;
+        return current;
 }
 
 template<typename T>
 DoublyLinkedList<T>::DoublyLinkedList() : head(nullptr), tail(nullptr), length(0) {
     head->next = tail;
     tail->prev = head;
-    head->prev = tail
+    head->prev = tail;
     tail->next = head;
 }
 
@@ -116,17 +118,18 @@ DoublyLinkedList<T>::DoublyLinkedList(const T (&values)[N]) : head(nullptr), len
 }
 
 template<typename T>
-void DoublyLinkedList<T>::append(const T& value) {
+DoublyLinkedList<T>& DoublyLinkedList<T>::append(const T& value) {
     std::unique_ptr<Node> new_node = std::make_unique<Node>(value);
     tail->prev->next = new_node;
     new_node->prev = tail->prev;
     new_node->next = tail;
     tail->prev = new_node;
     ++length;
+    return *this;
 }
 
 template<typename T>
-void DoublyLinkedList<T>::push(const T& value) {
+DoublyLinkedList<T>& DoublyLinkedList<T>::push(const T& value) {
     std::unique_ptr<Node> new_node = std::make_unique<Node>(value);
     std::unique_ptr<Node> current = head->next;
     new_node->next = current;
@@ -134,10 +137,11 @@ void DoublyLinkedList<T>::push(const T& value) {
     current->prev = new_node;
     head->next = new_node;
     ++length;
+    return *this;
 }
 
 template<typename T>
-void DoublyLinkedList<T>::insert(int index, const T& value) {
+DoublyLinkedList<T>& DoublyLinkedList<T>::insert(int index, const T& value) {
 
 
     std::unique_ptr<Node> new_node = std::make_unique<Node>(value);
@@ -146,21 +150,23 @@ void DoublyLinkedList<T>::insert(int index, const T& value) {
     new_node->prev = current_node;
     current_node->next = std::move(new_node);
     ++length;
+    return *this;
 }
 
 template<typename T>
-void DoublyLinkedList<T>::remove(int index) {
-
+DoublyLinkedList<T>& DoublyLinkedList<T>::remove(int index) {
 
     std::unique_ptr<Node> node_to_remove = iter_to_index(index);
                 node_to_remove->prev->next = node_to_remove->next;
             node_to_remove->next->prev = node_to_remove->prev;
+            return *this;
 }
 
 template<typename T>
-void DoublyLinkedList<T>::clear() {
+DoublyLinkedList<T>& DoublyLinkedList<T>::clear() {
     head->next = tail; // std::unique_ptr handles deallocations automatically once the other nodes go out of scope
     tail->prev = head;
+    return *this;
 }
 
 template<typename T>
@@ -243,7 +249,7 @@ int DoublyLinkedList<T>::lastIndexOf(const T& value) {
 }
 
 template<typename T>
-void DoublyLinkedList<T>::removeAll(const T& value) {
+DoublyLinkedList<T>& DoublyLinkedList<T>::removeAll(const T& value) {
     std::unique_ptr<Node> current = head->next;
 
     for (int i = 0; i < length; ++i) {
@@ -253,14 +259,16 @@ void DoublyLinkedList<T>::removeAll(const T& value) {
         }
         current = current->next;
     }
+    return *this;
 }
 
 template<typename T>
-void DoublyLinkedList<T>::set(int index, const T& value) {
-
+DoublyLinkedList<T>& DoublyLinkedList<T>::set(int index, const T& value) {
 
     std::unique_ptr<Node> node_at_index = iter_to_index(index);
     node_at_index->data = value;
+    return *this;
+
 }
 
 #endif  // DOUBLYLINKEDLIST_H
