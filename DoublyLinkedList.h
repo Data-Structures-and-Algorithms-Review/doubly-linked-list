@@ -126,8 +126,11 @@ void DoublyLinkedList<T>::append(const T& value) {
 template<typename T>
 void DoublyLinkedList<T>::push(const T& value) {
     std::unique_ptr<Node> new_node = std::make_unique<Node>(value);
-    new_node->next = std::move(head);
-    head = std::move(new_node);
+    std::unique_ptr<Node> current = head->next;
+    new_node->next = current;
+    new_node->prev = head;
+    current->prev = new_node;
+    head->next = new_node;
     ++length;
 }
 
