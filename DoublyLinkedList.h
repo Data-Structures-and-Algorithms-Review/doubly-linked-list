@@ -143,6 +143,7 @@ void DoublyLinkedList<T>::insert(int index, const T& value) {
     std::unique_ptr<Node> new_node = std::make_unique<Node>(value);
     std::unique_ptr<Node> current_node = iter_to_index(index);
     new_node->next = std::move(current_node->next);
+    new_node->prev = current_node;
     current_node->next = std::move(new_node);
     ++length;
 }
@@ -156,12 +157,14 @@ void DoublyLinkedList<T>::remove(int index) {
     std::unique_ptr<Node> node_before = iter_to_index(index - 1);
     std::unique_ptr<Node> node_to_remove = std::move(node_before->next);
     node_before->next = std::move(node_to_remove->next);
+    node_before->next->prev = node_before;
     --length;
 }
 
 template<typename T>
 void DoublyLinkedList<T>::clear() {
-    head->next = nullptr; // std::unique_ptr handles deallocations automatically once the other nodes go out of scope
+    head->next = tail; // std::unique_ptr handles deallocations automatically once the other nodes go out of scope
+    tail->prev = head;
 }
 
 template<typename T>
