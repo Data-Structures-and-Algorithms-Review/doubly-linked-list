@@ -18,7 +18,7 @@ private:
 
     std::unique_ptr<Node> head;
     std::unique_ptr<Node> tail;
-
+    
     std::unique_ptr<Node> iter_to_index(int index);
 
 public:
@@ -74,6 +74,10 @@ DoublyLinkedList<T>& DoublyLinkedList<T>::operator=(const DoublyLinkedList<T>& o
 
 template<typename T>
 std::unique_ptr<typename DoublyLinkedList<T>::Node> DoublyLinkedList<T>::iter_to_index(int index) {
+
+     if (index < 0 || index >= length) {
+        throw std::out_of_range("Index out of range");
+    }
 
     if (index < length / 2) {
         std::unique_ptr<Node> current = head;
@@ -136,9 +140,7 @@ void DoublyLinkedList<T>::push(const T& value) {
 
 template<typename T>
 void DoublyLinkedList<T>::insert(int index, const T& value) {
-    if (index < 0 || index >= length) {
-        throw std::out_of_range("Index out of range");
-    }
+
 
     std::unique_ptr<Node> new_node = std::make_unique<Node>(value);
     std::unique_ptr<Node> current_node = iter_to_index(index);
@@ -150,9 +152,7 @@ void DoublyLinkedList<T>::insert(int index, const T& value) {
 
 template<typename T>
 void DoublyLinkedList<T>::remove(int index) {
-    if (index < 0 || index >= length) {
-        throw std::out_of_range("Index out of range");
-    }
+
 
     std::unique_ptr<Node> node_before = iter_to_index(index - 1);
     std::unique_ptr<Node> node_to_remove = std::move(node_before->next);
@@ -169,13 +169,12 @@ void DoublyLinkedList<T>::clear() {
 
 template<typename T>
 T DoublyLinkedList<T>::pop(int index) {
-    if (index < 0 || index >= length) {
-        throw std::out_of_range("Index out of range");
-    }
+
 
     std::unique_ptr<Node> node_before = iter_to_index(index - 1);
     std::unique_ptr<Node> node_to_remove = std::move(node_before->next);
-    node_before->next = std::move(node_to_remove->next);
+    node_before->next = std::move(node_to_remove->next); // std::unique_ptr handles deallocations automatically once the other nodes go out of scope
+    node_before->next->prev = node_before;
     --length;
     return node_to_remove->data;
 }
@@ -209,9 +208,7 @@ bool DoublyLinkedList<T>::contains(const T& value) {
 
 template<typename T>
 T DoublyLinkedList<T>::get(int index) {
-    if (index < 0 || index >= length) {
-        throw std::out_of_range("Index out of range");
-    }
+
 
     std::unique_ptr<Node> node_at_index = iter_to_index(index);
     return node_at_index->data;
@@ -219,9 +216,7 @@ T DoublyLinkedList<T>::get(int index) {
 
 template<typename T>
 std::unique_ptr<typename DoublyLinkedList<T>::Node> DoublyLinkedList<T>::getNode(int index) {
-    if (index < 0 || index >= length) {
-        throw std::out_of_range("Index out of range");
-    }
+
 
     std::unique_ptr<Node> node_at_index = iter_to_index(index);
     return node_at_index;
@@ -276,9 +271,7 @@ void DoublyLinkedList<T>::removeAll(const T& value) {
 
 template<typename T>
 void DoublyLinkedList<T>::set(int index, const T& value) {
-    if (index < 0 || index >= length) {
-        throw std::out_of_range("Index out of range");
-    }
+
 
     std::unique_ptr<Node> node_at_index = iter_to_index(index);
     node_at_index->data = value;
