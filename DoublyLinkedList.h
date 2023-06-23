@@ -118,12 +118,10 @@ DoublyLinkedList<T>::DoublyLinkedList(const T (&values)[N]) : head(nullptr), len
 template<typename T>
 void DoublyLinkedList<T>::append(const T& value) {
     std::unique_ptr<Node> new_node = std::make_unique<Node>(value);
-    std::unique_ptr<Node> current = tail->prev;
-    current->next = new_node;
-    new_node->prev = current;
+    tail->prev->next = new_node;
+    new_node->prev = tail->prev;
     new_node->next = tail;
     tail->prev = new_node;
-    std::unique_ptr<Node> current = head;
     ++length;
 }
 
