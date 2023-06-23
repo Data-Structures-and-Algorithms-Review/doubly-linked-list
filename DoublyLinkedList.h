@@ -1,5 +1,5 @@
-#ifndef DoublyLINKEDLIST_H
-#define DoublyLINKEDLIST_H
+#ifndef DOUBLYLINKEDLIST_H
+#define DOUBLYLINKEDLIST_H
 
 #include <memory>
 #include <iostream>
@@ -18,7 +18,7 @@ private:
 
     std::unique_ptr<Node> head;
     std::unique_ptr<Node> tail;
-    
+
     std::unique_ptr<Node> iter_to_index(int index);
 
 public:
@@ -154,11 +154,9 @@ template<typename T>
 void DoublyLinkedList<T>::remove(int index) {
 
 
-    std::unique_ptr<Node> node_before = iter_to_index(index - 1);
-    std::unique_ptr<Node> node_to_remove = std::move(node_before->next);
-    node_before->next = std::move(node_to_remove->next);
-    node_before->next->prev = node_before;
-    --length;
+    std::unique_ptr<Node> node_to_remove = iter_to_index(index);
+                node_to_remove->prev->next = node_to_remove->next;
+            node_to_remove->next->prev = node_to_remove->prev;
 }
 
 template<typename T>
@@ -237,33 +235,23 @@ int DoublyLinkedList<T>::firstIndexOf(const T& value) {
 
 template<typename T>
 int DoublyLinkedList<T>::lastIndexOf(const T& value) {
-    std::unique_ptr<Node> current = head;
-    int last_index = -1;
-
-    for (int i = 0; i < length; ++i) {
+    std::unique_ptr<Node> current = tail;
+    for (int i = length - 1; i >= 0; --i) {
         if (current->data == value) {
-            last_index = i;
+            return i;
         }
-        current = current->next;
+        current = current->prev;
     }
-    return last_index;
 }
 
 template<typename T>
 void DoublyLinkedList<T>::removeAll(const T& value) {
-    std::unique_ptr<Node> current = head;
-    std::unique_ptr<Node> prev = nullptr;
+    std::unique_ptr<Node> current = head->next;
 
     for (int i = 0; i < length; ++i) {
         if (current->data == value) {
-            if (prev == nullptr) {
-                head = std::move(current->next);
-            } else {
-                prev->next = std::move(current->next);
-            }
-            --length;
-        } else {
-            prev = current;
+            current->prev->next = current->next;
+            current->next->prev = current->prev;
         }
         current = current->next;
     }
@@ -277,4 +265,4 @@ void DoublyLinkedList<T>::set(int index, const T& value) {
     node_at_index->data = value;
 }
 
-#endif  // DoublyLINKEDLIST_H
+#endif  // DOUBLYLINKEDLIST_H
